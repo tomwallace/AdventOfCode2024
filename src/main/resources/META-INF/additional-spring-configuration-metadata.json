@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "app.year",
+      "type": "java.lang.String",
+      "description": "Advent of Code year."
+  }
+] }
