@@ -100,7 +100,4 @@ public class ProblemCommands {
 
         return problemSet.orElse(null);
     }
-    // TODO: TW - create git repo and put in Github
-    // TODO: TW - exclude the main/resources/data directory so we do not include the problem inputs
-
 }
