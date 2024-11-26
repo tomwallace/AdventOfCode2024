@@ -8,6 +8,7 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
+// Previous year's problem to test out project set up.
 public class OldDay1 implements IAdventProblemSet {
 
     private Map<String, String> numbers = Map.ofEntries(
