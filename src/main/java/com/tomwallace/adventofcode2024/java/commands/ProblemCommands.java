@@ -10,6 +10,7 @@ import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -82,9 +83,10 @@ public class ProblemCommands {
                 .map(bd -> {
                     try {
                         var clazz = Class.forName(bd.getBeanClassName());
-                        var adventProblemSet = clazz.newInstance();
+                        var adventProblemSet = clazz.getDeclaredConstructor().newInstance();
                         return (IAdventProblemSet) adventProblemSet;
-                    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                             NoSuchMethodException | InvocationTargetException e) {
                         throw new RuntimeException(e);
                     }
                 })
