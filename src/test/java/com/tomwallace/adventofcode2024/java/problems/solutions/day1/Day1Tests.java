@@ -1,4 +1,4 @@
-package com.tomwallace.adventofcode2024.java.problems.solutions;
+package com.tomwallace.adventofcode2024.java.problems.solutions.day1;
 
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
 import org.junit.jupiter.api.Test;

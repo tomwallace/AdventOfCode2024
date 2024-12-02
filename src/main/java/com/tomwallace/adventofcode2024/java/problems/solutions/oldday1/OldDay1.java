@@ -1,4 +1,4 @@
-package com.tomwallace.adventofcode2024.java.problems.solutions;
+package com.tomwallace.adventofcode2024.java.problems.solutions.oldday1;
 
 import com.tomwallace.adventofcode2024.java.problems.IAdventProblemSet;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
