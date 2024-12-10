@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileUtility {
@@ -31,5 +32,14 @@ public class FileUtility {
         }
 
         return splits;
+    }
+
+    /***
+     * Splits a file into a List of List of Characters, which is often used to make a map or grid of puzzle inputs
+     * @param filePath - The path of the file, relative to the root of the main project
+     * @return a List of List of Characters
+     */
+    public static List<List<Character>> parseFileToListListCharacter(String filePath) {
+        return parseFileToList(filePath, line -> line.chars().mapToObj(c -> (char) c).collect(Collectors.toList()));
     }
 }

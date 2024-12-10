@@ -40,7 +40,7 @@ public class Day4 implements IAdventProblemSet {
 
     protected Integer countWordOccurrences(String filePath) {
         var targetWord = "XMAS";
-        List<List<Character>> grid = FileUtility.parseFileToList(filePath, line -> line.chars().mapToObj(c -> (char) c).collect(Collectors.toList()));
+        List<List<Character>> grid = FileUtility.parseFileToListListCharacter(filePath);
         var wordCount = 0;
         for (int y = 0; y < grid.size(); y++) {
             for (int x = 0; x < grid.get(y).size(); x++) {
@@ -51,7 +51,7 @@ public class Day4 implements IAdventProblemSet {
     }
 
     protected Integer countMasCrosses(String filePath) {
-        List<List<Character>> grid = FileUtility.parseFileToList(filePath, line -> line.chars().mapToObj(c -> (char) c).collect(Collectors.toList()));
+        List<List<Character>> grid = FileUtility.parseFileToListListCharacter(filePath);
         var wordCount = 0;
         for (int y = 0; y < grid.size(); y++) {
             for (int x = 0; x < grid.get(y).size(); x++) {

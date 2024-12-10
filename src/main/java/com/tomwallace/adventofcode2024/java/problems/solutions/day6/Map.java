@@ -24,7 +24,7 @@ public class Map {
     private Boolean exitOnRepeatState;
 
     public Map(String filePath, Boolean exitOnRepeatState) {
-        grid = FileUtility.parseFileToList(filePath, line -> line.chars().mapToObj(c -> (char) c).collect(Collectors.toList()));
+        grid = FileUtility.parseFileToListListCharacter(filePath);
         findGuardLocationAndHeading();
         states = new HashSet<>();
         visited = new HashSet<>();
