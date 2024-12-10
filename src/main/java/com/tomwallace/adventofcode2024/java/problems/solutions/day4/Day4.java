@@ -4,7 +4,6 @@ import com.tomwallace.adventofcode2024.java.problems.IAdventProblemSet;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Day4 implements IAdventProblemSet {
 
@@ -120,6 +119,7 @@ public class Day4 implements IAdventProblemSet {
         if (!isValid(grid, new Point(current.x - 1, current.y + 1)))
             return false;
         var bottomLeft = grid.get(current.y + 1).get(current.x - 1);
+        //noinspection RedundantIfStatement
         if ((topRight == 'M' && bottomLeft != 'S') || (topRight == 'S' && bottomLeft != 'M'))
             return false;
 
