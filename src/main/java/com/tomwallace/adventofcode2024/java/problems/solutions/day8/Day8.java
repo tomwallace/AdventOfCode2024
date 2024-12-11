@@ -1,5 +1,6 @@
 package com.tomwallace.adventofcode2024.java.problems.solutions.day8;
 
+import com.tomwallace.adventofcode2024.java.problems.Difficulty;
 import com.tomwallace.adventofcode2024.java.problems.IAdventProblemSet;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
 
@@ -39,6 +40,20 @@ public class Day8 implements IAdventProblemSet {
         var filePath = FileUtility.dataPath + "Day8Input.txt";
         var count = countUniqueAntiNodeLocations(filePath, true);
         return count.toString();
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    public Difficulty difficulty() {
+        return Difficulty.MEDIUM;
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    public Boolean isFavorite() {
+        return true;
     }
 
     protected Integer countUniqueAntiNodeLocations(String filePath, Boolean useResonance) {

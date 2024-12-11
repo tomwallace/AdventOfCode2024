@@ -73,8 +73,6 @@ public class Antenna {
         return antiNodes;
     }
 
-    // TODO: Handle Part B
-
     private void addAntiNodeIfInBounds(List<Point> antiNodes, Point potentialPoint, Integer gridMaxX, Integer gridMaxY) {
         if (isPointInBounds(potentialPoint, gridMaxX, gridMaxY))
             antiNodes.add(new Point(potentialPoint.x(), potentialPoint.y()));

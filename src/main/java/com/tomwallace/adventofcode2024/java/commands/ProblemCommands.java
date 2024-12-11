@@ -37,13 +37,15 @@ public class ProblemCommands {
         var builder = new StringBuilder();
         builder.append(String.format("AdventOfCode" + appYear + "has the following problem sets:"));
         builder.append(System.lineSeparator());
-        builder.append("Class Name - Description");
+        builder.append("Class     Description                   Difficulty   Favorite");
         builder.append(System.lineSeparator());
-        builder.append("-----------------------------------------------------");
+        builder.append("Name");
+        builder.append(System.lineSeparator());
+        builder.append("-------------------------------------------------------------");
         builder.append(System.lineSeparator());
 
         for (IAdventProblemSet problemSet : getAdventProblemSets()) {
-            builder.append(String.format("%s - %s", problemSet.getClass().getSimpleName(), problemSet.description()));
+            builder.append(String.format("%s%s%s%s", padRight(problemSet.getClass().getSimpleName(), 10), padRight(problemSet.description(), 30), padRight(problemSet.difficulty().toString(), 13), problemSet.isFavorite() ? "*" : ""));
             builder.append(System.lineSeparator());
         }
         builder.append(System.lineSeparator());
@@ -101,5 +103,9 @@ public class ProblemCommands {
                 .findFirst();
 
         return problemSet.orElse(null);
+    }
+
+    private String padRight(String input, int length) {
+        return String.format("%-" + length + "s", input);
     }
 }

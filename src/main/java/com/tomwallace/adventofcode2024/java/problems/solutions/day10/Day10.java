@@ -1,5 +1,6 @@
 package com.tomwallace.adventofcode2024.java.problems.solutions.day10;
 
+import com.tomwallace.adventofcode2024.java.problems.Difficulty;
 import com.tomwallace.adventofcode2024.java.problems.IAdventProblemSet;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
 
@@ -37,6 +38,20 @@ public class Day10 implements IAdventProblemSet {
         var filePath = FileUtility.dataPath + "Day10Input.txt";
         var sum = sumTrailCalculations(filePath, false);
         return sum.toString();
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    public Difficulty difficulty() {
+        return Difficulty.MEDIUM;
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    public Boolean isFavorite() {
+        return true;
     }
 
     protected Integer sumTrailCalculations(String filePath, Boolean useTrailScore) {

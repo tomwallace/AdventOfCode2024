@@ -29,6 +29,15 @@ public interface IAdventProblemSet {
      */
     Integer sortOrder();
 
-    // TODO: Add values for difficulty - enum: EASY, MEDIUM, HARD; and Boolean for favorite - update the description javadoc
-    // TODO: Display that information in the list function
+    /***
+     * The relative difficulty of the ProblemSet.
+     * @return The ProblemSet difficulty
+     */
+    Difficulty difficulty();
+
+    /***
+     * If the ProblemSet is a favorite for the year.
+     * @return If the ProblemSet is a favorite
+     */
+    Boolean isFavorite();
 }

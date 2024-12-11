@@ -1,5 +1,6 @@
 package com.tomwallace.adventofcode2024.java.problems.solutions.day6;
 
+import com.tomwallace.adventofcode2024.java.problems.Difficulty;
 import com.tomwallace.adventofcode2024.java.problems.IAdventProblemSet;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
 
@@ -33,6 +34,20 @@ public class Day6 implements IAdventProblemSet {
         var filePath = FileUtility.dataPath + "Day6Input.txt";
         var count = countObstructionPositions(filePath);
         return count.toString();
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    public Difficulty difficulty() {
+        return Difficulty.MEDIUM;
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    public Boolean isFavorite() {
+        return false;
     }
 
     protected Integer countObstructionPositions(String filePath) {

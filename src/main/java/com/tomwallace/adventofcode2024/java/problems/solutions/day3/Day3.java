@@ -1,5 +1,6 @@
 package com.tomwallace.adventofcode2024.java.problems.solutions.day3;
 
+import com.tomwallace.adventofcode2024.java.problems.Difficulty;
 import com.tomwallace.adventofcode2024.java.problems.IAdventProblemSet;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
 
@@ -39,6 +40,20 @@ public class Day3 implements IAdventProblemSet {
         var input = String.join("", FileUtility.parseFileToList(filePath, line -> line));
         long total = sumAllMulMatchingPairsOnOff(input);
         return String.format("%d", total);
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    public Difficulty difficulty() {
+        return Difficulty.MEDIUM;
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    public Boolean isFavorite() {
+        return true;
     }
 
     protected Long sumAllMulMatchingPairs(String input) {
