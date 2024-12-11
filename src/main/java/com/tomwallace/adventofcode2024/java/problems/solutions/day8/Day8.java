@@ -1,5 +1,6 @@
 package com.tomwallace.adventofcode2024.java.problems.solutions.day8;
 
+import com.tomwallace.adventofcode2024.java.common.Point;
 import com.tomwallace.adventofcode2024.java.problems.Difficulty;
 import com.tomwallace.adventofcode2024.java.problems.IAdventProblemSet;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;

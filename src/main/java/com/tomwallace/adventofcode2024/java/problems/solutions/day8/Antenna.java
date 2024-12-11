@@ -1,5 +1,7 @@
 package com.tomwallace.adventofcode2024.java.problems.solutions.day8;
 
+import com.tomwallace.adventofcode2024.java.common.Point;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

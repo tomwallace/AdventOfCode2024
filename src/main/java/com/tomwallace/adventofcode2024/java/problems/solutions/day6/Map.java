@@ -1,6 +1,8 @@
 package com.tomwallace.adventofcode2024.java.problems.solutions.day6;
 
+import com.tomwallace.adventofcode2024.java.common.Point;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
+import com.tomwallace.adventofcode2024.java.utilities.GridUtility;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -33,8 +35,8 @@ public class Map {
     public Integer findNumberOfStepsUntilGuardLeaves() {
         var notOutYet = 1;
         do {
-            visited.add(new Point(guardLocation.x, guardLocation.y));
-            states.add(new State(new Point(guardLocation.x, guardLocation.y), guardHeading));
+            visited.add(new Point(guardLocation.x(), guardLocation.y()));
+            states.add(new State(new Point(guardLocation.x(), guardLocation.y()), guardHeading));
             notOutYet = moveGuard();
             if (exitOnRepeatState && notOutYet == -1) {
                 return -1;
@@ -46,9 +48,9 @@ public class Map {
 
     @SneakyThrows
     private Integer moveGuard() {
-        var newX = guardLocation.x + mods.get(guardHeading).x;
-        var newY = guardLocation.y + mods.get(guardHeading).y;
-        if (!isPointInBounds(new Point(newX, newY))) {
+        var newX = guardLocation.x() + mods.get(guardHeading).x();
+        var newY = guardLocation.y() + mods.get(guardHeading).y();
+        if (!GridUtility.isPointInBounds(new Point(newX, newY), grid)) {
             return 0;
         }
         if (exitOnRepeatState && states.contains(new State(new Point(newX, newY), guardHeading))) {
@@ -65,9 +67,9 @@ public class Map {
             if (guardHeading > 3)
                 guardHeading = 0;
 
-            newX = guardLocation.x + mods.get(guardHeading).x;
-            newY = guardLocation.y + mods.get(guardHeading).y;
-            if (!isPointInBounds(new Point(newX, newY))) {
+            newX = guardLocation.x() + mods.get(guardHeading).x();
+            newY = guardLocation.y() + mods.get(guardHeading).y();
+            if (!GridUtility.isPointInBounds(new Point(newX, newY), grid)) {
                 return 0;
             }
             if (exitOnRepeatState && states.contains(new State(new Point(newX, newY), guardHeading))) {
@@ -82,10 +84,6 @@ public class Map {
 
         // Should not get here
         throw new Exception("Should not have gotten here");
-    }
-
-    private Boolean isPointInBounds(Point point) {
-        return point.x >= 0 && point.x < grid.get(0).size() && point.y >= 0 && point.y < grid.size();
     }
 
     @SneakyThrows
@@ -119,8 +117,5 @@ public class Map {
         }
     }
 
-
-
-    public record Point(Integer x, Integer y) {}
     public record State(Point guardLocation, Integer guardHeading) {}
 }
