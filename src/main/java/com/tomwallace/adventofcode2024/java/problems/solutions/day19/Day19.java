@@ -2,14 +2,15 @@ package com.tomwallace.adventofcode2024.java.problems.solutions.day19;
 
 import com.tomwallace.adventofcode2024.java.problems.Difficulty;
 import com.tomwallace.adventofcode2024.java.problems.IAdventProblemSet;
-import com.tomwallace.adventofcode2024.java.problems.solutions.day18.Maze;
 import com.tomwallace.adventofcode2024.java.utilities.FileUtility;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class Day19 implements IAdventProblemSet {
 
+    public HashMap<String, Long> cache;
     /***
      * {@inheritDoc}
      */
@@ -51,15 +52,16 @@ public class Day19 implements IAdventProblemSet {
      * {@inheritDoc}
      */
     public Boolean isFavorite() {
-        return false;
+        return true;
     }
 
     protected Long countPossibleDesigns(String filePath) {
         var lines = FileUtility.parseFileToList(filePath, line -> line);
         var patterns = Arrays.stream(lines.get(0).split(", ")).toList();
         var designs = lines.stream().skip(2).toList();
+        cache = new HashMap<>();
         return designs.stream()
-                .filter(d -> isDesignPossibleRecurse(d, patterns))
+                .filter(d -> countDesignPossibleRecurse(d, patterns) > 0)
                 .count();
     }
 
@@ -67,39 +69,27 @@ public class Day19 implements IAdventProblemSet {
         var lines = FileUtility.parseFileToList(filePath, line -> line);
         var patterns = Arrays.stream(lines.get(0).split(", ")).toList();
         var designs = lines.stream().skip(2).toList();
+        cache = new HashMap<>();
         return designs.stream()
                 .mapToLong(d -> countDesignPossibleRecurse(d, patterns))
                 .sum();
     }
 
-    protected Boolean isDesignPossibleRecurse(String design, final List<String> patterns) {
+    protected Long countDesignPossibleRecurse(String design, final List<String> patterns) {
+        if (cache.containsKey(design)) {
+            return cache.get(design);
+        }
         if (design.isEmpty())   {
-            return true;
+            return 1L;
         }
-
-        for (var pattern : patterns) {
-            // May need to change to contains
-            if (design.startsWith(pattern)) {
-                if (isDesignPossibleRecurse(design.substring(pattern.length()), patterns)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    protected Integer countDesignPossibleRecurse(String design, final List<String> patterns) {
-        if (design.isEmpty())   {
-            return 1;
-        }
-        var total = 0;
+        var total = 0L;
         for (var pattern : patterns) {
             // May need to change to contains
             if (design.startsWith(pattern)) {
                 total += countDesignPossibleRecurse(design.substring(pattern.length()), patterns);
             }
         }
+        cache.put(design, total);
 
         return total;
     }
