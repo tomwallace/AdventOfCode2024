@@ -57,14 +57,14 @@ public class Day13 implements IAdventProblemSet {
     protected Long sumFewestTokensNeeded(String filePath) {
         var machines = createClawMachines(filePath, true);
         return machines.stream()
-                .mapToLong(m -> m.findSmallestTokensByEquation(100L))
+                .mapToLong(ClawMachine::findSmallestTokensByEquation)
                 .sum();
     }
 
     protected Long sumFewestTokensNeededBig(String filePath) {
         var machines = createClawMachines(filePath, false);
         return machines.stream()
-                .mapToLong(m -> m.findSmallestTokensByEquation(Long.MAX_VALUE))
+                .mapToLong(ClawMachine::findSmallestTokensByEquation)
                 .sum();
     }
 

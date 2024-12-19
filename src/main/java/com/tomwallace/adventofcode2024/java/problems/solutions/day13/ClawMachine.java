@@ -27,8 +27,7 @@ public class ClawMachine {
         return best == Long.MAX_VALUE ? 0 : best;
     }
 
-    // Works on everything BUT Part B
-    public Long findSmallestTokensByEquation(Long maxClicks) {
+    public Long findSmallestTokensByEquation() {
         // equation from Reddit thread, as brute force would clearly not work and high school math was a long time ago
         // b=(py*ax-px*ay)/(by*ax-bx*ay) a=(px-b*bx)/ax
         var bTop = (target.y() * aMod.x() - target.x() * aMod.y());
@@ -36,30 +35,11 @@ public class ClawMachine {
         if (bTop % bBottom != 0)
             return 0L;
         var b = bTop/bBottom;
-        var a = (target.x() - b * bMod.x())/aMod.x();
-        if (a > maxClicks || b > maxClicks)
+        var aTop = target.x() - b * bMod.x();
+        var aBottom = aMod.x();
+        if (aTop % aBottom != 0)
             return 0L;
-        return (a * 3) + b;
-    }
-
-    // TODO: TW - clean up unused code
-    public Long findSmallestTokensByMid() {
-        var low = 0L;
-        var high = Long.MAX_VALUE;
-        var b = 0L;
-        while (high > low) {
-            var middle = (high - low) / 2;
-            b = (target.x() - aMod.x() * middle) / bMod.x();
-            var destinationY = aMod.y() * middle + bMod.y() * b;
-            if (destinationY >= target.y()) {
-                high = middle;
-            } else {
-                low = middle + 1;
-            }
-        }
-
-        var a = low;
-        b = (target.x() - aMod.x() * b);
+        var a = aTop/aBottom;
         return (a * 3) + b;
     }
 
