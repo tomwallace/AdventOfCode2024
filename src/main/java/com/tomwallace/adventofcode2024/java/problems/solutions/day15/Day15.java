@@ -25,7 +25,7 @@ public class Day15 implements IAdventProblemSet {
      */
     public String partA() {
         var filePath = FileUtility.dataPath + "Day15Input.txt";
-        var total = sumGpsCoordinates(filePath);
+        var total = sumGpsCoordinates(filePath, false);
         return total.toString();
     }
 
@@ -42,17 +42,17 @@ public class Day15 implements IAdventProblemSet {
      * {@inheritDoc}
      */
     public Difficulty difficulty() {
-        return Difficulty.MEDIUM;
+        return Difficulty.HARD;
     }
 
     /***
      * {@inheritDoc}
      */
     public Boolean isFavorite() {
-        return false;
+        return true;
     }
 
-    protected Integer sumGpsCoordinates(String filePath) {
+    protected Integer sumGpsCoordinates(String filePath, Boolean isWide) {
         var lines = FileUtility.parseFileToList(filePath, line -> line);
         var warehouseLines = new ArrayList<String>();
         var builder = new StringBuilder();
@@ -69,11 +69,15 @@ public class Day15 implements IAdventProblemSet {
             }
         }
         var warehouse = new Warehouse(warehouseLines);
+        if (isWide) {
+            warehouse.widen();
+            warehouse.printGrid();
+        }
         for (Character inst : builder.toString().toCharArray()) {
             warehouse.moveRobot(inst);
-            //warehouse.printGrid();
+            warehouse.printGrid();
         }
-
+        warehouse.printGrid();
         return warehouse.sumGpsCoordinates();
     }
 

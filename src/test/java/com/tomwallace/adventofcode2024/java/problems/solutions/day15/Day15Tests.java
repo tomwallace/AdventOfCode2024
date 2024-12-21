@@ -14,7 +14,18 @@ public class Day15Tests {
     public void sumGpsCoordinates(String input, Integer expected) {
         var filePath = FileUtility.testDataPath + input;
         var sut = new Day15();
-        var result = sut.sumGpsCoordinates(filePath);
+        var result = sut.sumGpsCoordinates(filePath, false);
+
+        assertEquals(expected, result);
+    }
+
+    @ParameterizedTest
+    //@CsvSource({"Day15TestInputB.txt,9021"})
+    @CsvSource({"Day15TestInputC.txt,105"})
+    public void sumGpsCoordinates_Wide(String input, Integer expected) {
+        var filePath = FileUtility.testDataPath + input;
+        var sut = new Day15();
+        var result = sut.sumGpsCoordinates(filePath, true);
 
         assertEquals(expected, result);
     }

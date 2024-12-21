@@ -20,14 +20,44 @@ public class Warehouse {
         }
         maxX = grid.get(0).size();
         maxY = grid.size();
+        determineRobot();
+    }
+
+    public void widen() {
+        // Put robot symbol back
+        grid.get(robot.y()).set(robot.x(),'@');
+        List<List<Character>> newGrid = new ArrayList<>();
         for (int y = 0; y < maxY; y++) {
+            var row = new ArrayList<Character>();
             for (int x = 0; x < maxX; x++) {
-                if (grid.get(y).get(x) == '@') {
-                    robot = new Point(x, y);
-                    grid.get(y).set(x, '.');
+                var current = grid.get(y).get(x);
+                switch (current) {
+                    case '#':
+                        row.add('#');
+                        row.add('#');
+                        break;
+                    case 'O':
+                        row.add('[');
+                        row.add(']');
+                        break;
+                    case '.':
+                        row.add('.');
+                        row.add('.');
+                        break;
+                    case '@':
+                        row.add('@');
+                        row.add('.');
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected in creating wider grid value: " + current);
                 }
             }
+            newGrid.add(row);
         }
+        grid = newGrid;
+        maxX = grid.get(0).size();
+        maxY = grid.size();
+        determineRobot();
     }
 
     public void moveRobot(Character direction) {
@@ -70,6 +100,17 @@ public class Warehouse {
         return sum;
     }
 
+    private void determineRobot() {
+        for (int y = 0; y < maxY; y++) {
+            for (int x = 0; x < maxX; x++) {
+                if (grid.get(y).get(x) == '@') {
+                    robot = new Point(x, y);
+                    grid.get(y).set(x, '.');
+                }
+            }
+        }
+    }
+
 
     // TODO: Refactor to remove duplicated code
     private void tryMoveRight() {
@@ -94,6 +135,21 @@ public class Warehouse {
                     }
                     robot = new Point(targetX, targetY);
                     grid.get(targetY).set(targetX, '.');
+                    break;
+                }
+            }
+        } else if (grid.get(targetY).get(targetX) == '[') {
+            for (var x = targetX + 1; x < maxX; x++) {
+                if (grid.get(targetY).get(x) == '#')
+                    break;
+                if (grid.get(targetY).get(x) == '.') {
+                    for (var backX = x; backX > targetX; backX -= 2) {
+                        grid.get(targetY).set(backX, ']');
+                        grid.get(targetY).set(backX - 1, '[');
+                    }
+                    robot = new Point(targetX, targetY);
+                    grid.get(targetY).set(targetX, '.');
+                    grid.get(targetY).set(targetX - 1, '.');
                     break;
                 }
             }
@@ -125,6 +181,36 @@ public class Warehouse {
                     break;
                 }
             }
+        } else if (grid.get(targetY).get(targetX) == '[') {
+            for (var y = targetY; y < maxY; y++) {
+                if (grid.get(y).get(targetX) == '#' || grid.get(y).get(targetX + 1) == '#')
+                    break;
+                if (grid.get(y).get(targetX) == '.' && grid.get(y).get(targetX + 1) == '.') {
+                    for (var backY = y; backY > targetY; backY--) {
+                        grid.get(backY).set(targetX, '[');
+                        grid.get(backY).set(targetX + 1, ']');
+                    }
+                    robot = new Point(targetX, targetY);
+                    grid.get(targetY).set(targetX, '.');
+                    grid.get(targetY).set(targetX + 1, '.');
+                    break;
+                }
+            }
+        } else if (grid.get(targetY).get(targetX) == ']') {
+            for (var y = targetY; y < maxY; y++) {
+                if (grid.get(y).get(targetX) == '#' || grid.get(y).get(targetX - 1) == '#')
+                    break;
+                if (grid.get(y).get(targetX) == '.' && grid.get(y).get(targetX - 1) == '.') {
+                    for (var backY = y; backY > targetY; backY--) {
+                        grid.get(backY).set(targetX, ']');
+                        grid.get(backY).set(targetX - 1, '[');
+                    }
+                    robot = new Point(targetX, targetY);
+                    grid.get(targetY).set(targetX, '.');
+                    grid.get(targetY).set(targetX - 1, '.');
+                    break;
+                }
+            }
         }
     }
 
@@ -153,6 +239,21 @@ public class Warehouse {
                     break;
                 }
             }
+        } else if (grid.get(targetY).get(targetX) == ']') {
+            for (var x = targetX - 1; x >= 0; x--) {
+                if (grid.get(targetY).get(x) == '#')
+                    break;
+                if (grid.get(targetY).get(x) == '.') {
+                    for (var backX = x; backX < targetX; backX += 2) {
+                        grid.get(targetY).set(backX, '[');
+                        grid.get(targetY).set(backX + 1, ']');
+                    }
+                    robot = new Point(targetX, targetY);
+                    grid.get(targetY).set(targetX, '.');
+                    grid.get(targetY).set(targetX + 1, '.');
+                    break;
+                }
+            }
         }
     }
 
@@ -178,6 +279,36 @@ public class Warehouse {
                     }
                     robot = new Point(targetX, targetY);
                     grid.get(targetY).set(targetX, '.');
+                    break;
+                }
+            }
+        } else if (grid.get(targetY).get(targetX) == '[') {
+            for (var y = targetY; y >= 0; y--) {
+                if (grid.get(y).get(targetX) == '#' || grid.get(y).get(targetX + 1) == '#')
+                    break;
+                if (grid.get(y).get(targetX) == '.' && grid.get(y).get(targetX + 1) == '.') {
+                    for (var backY = y; backY < targetY; backY++) {
+                        grid.get(backY).set(targetX, '[');
+                        grid.get(backY).set(targetX + 1, ']');
+                    }
+                    robot = new Point(targetX, targetY);
+                    grid.get(targetY).set(targetX, '.');
+                    grid.get(targetY).set(targetX + 1, '.');
+                    break;
+                }
+            }
+        } else if (grid.get(targetY).get(targetX) == ']') {
+            for (var y = targetY; y >= 0; y--) {
+                if (grid.get(y).get(targetX) == '#' || grid.get(y).get(targetX - 1) == '#')
+                    break;
+                if (grid.get(y).get(targetX) == '.' && grid.get(y).get(targetX - 1) == '.') {
+                    for (var backY = y; backY < targetY; backY++) {
+                        grid.get(backY).set(targetX, ']');
+                        grid.get(backY).set(targetX - 1, '[');
+                    }
+                    robot = new Point(targetX, targetY);
+                    grid.get(targetY).set(targetX, '.');
+                    grid.get(targetY).set(targetX - 1, '.');
                     break;
                 }
             }
