@@ -72,6 +72,7 @@ public class Day22 implements IAdventProblemSet {
         var mostBananas = salesPrices.values().stream()
                 .max(Comparator.naturalOrder());
 
+        //noinspection OptionalGetWithoutIsPresent
         return mostBananas.get();
     }
 
