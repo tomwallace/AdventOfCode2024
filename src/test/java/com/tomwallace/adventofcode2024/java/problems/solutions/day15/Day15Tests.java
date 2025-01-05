@@ -11,7 +11,7 @@ public class Day15Tests {
 
     @ParameterizedTest
     @CsvSource({"Day15TestInputA.txt,2028", "Day15TestInputB.txt,10092"})
-    public void sumGpsCoordinates(String input, Integer expected) {
+    public void sumGpsCoordinates(String input, Long expected) {
         var filePath = FileUtility.testDataPath + input;
         var sut = new Day15();
         var result = sut.sumGpsCoordinates(filePath, false);
@@ -20,9 +20,8 @@ public class Day15Tests {
     }
 
     @ParameterizedTest
-    //@CsvSource({"Day15TestInputB.txt,9021"})
-    @CsvSource({"Day15TestInputC.txt,105"})
-    public void sumGpsCoordinates_Wide(String input, Integer expected) {
+    @CsvSource({"Day15TestInputC.txt,618", "Day15TestInputB.txt,9021"})
+    public void sumGpsCoordinates_Wide(String input, Long expected) {
         var filePath = FileUtility.testDataPath + input;
         var sut = new Day15();
         var result = sut.sumGpsCoordinates(filePath, true);
@@ -38,16 +37,11 @@ public class Day15Tests {
         assertEquals("1517819", result);
     }
 
-    // TODO: TW - still have to implement Part B
-    /*
-
     @Test
     public void partB_Actual() {
-        var sut = new Day14();
+        var sut = new Day15();
         var result = sut.partB();
 
-        assertEquals("7858", result);
+        assertEquals("1538862", result);
     }
-
-     */
 }

@@ -1,84 +1,102 @@
 package com.tomwallace.adventofcode2024.java.problems.solutions.day15;
 
 import com.tomwallace.adventofcode2024.java.common.Point;
-import com.tomwallace.adventofcode2024.java.utilities.GridUtility;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Warehouse {
     private List<List<Character>> grid;
     private Point robot;
-    private Integer maxX;
-    private Integer maxY;
+    private final Integer maxX;
+    private final Integer maxY;
 
-    public Warehouse(List<String> input) {
+    private List<Point> boxes;
+    private List<Point> moveableBoxes;
+    private final List<Point> walls;
+    private final Boolean isWide;
+
+    public Warehouse(List<String> input, Boolean isWide) {
         grid = new ArrayList<>();
+        boxes = new ArrayList<>();
+        moveableBoxes = new ArrayList<>();
+        walls = new ArrayList<>();
+        this.isWide = isWide;
         for (String line : input) {
             grid.add(line.chars().mapToObj(c -> (char) c).collect(Collectors.toList()));
         }
+        checkAndWidenGrid();
         maxX = grid.get(0).size();
         maxY = grid.size();
-        determineRobot();
-    }
-
-    public void widen() {
-        // Put robot symbol back
-        grid.get(robot.y()).set(robot.x(),'@');
-        List<List<Character>> newGrid = new ArrayList<>();
         for (int y = 0; y < maxY; y++) {
-            var row = new ArrayList<Character>();
             for (int x = 0; x < maxX; x++) {
-                var current = grid.get(y).get(x);
-                switch (current) {
-                    case '#':
-                        row.add('#');
-                        row.add('#');
-                        break;
-                    case 'O':
-                        row.add('[');
-                        row.add(']');
-                        break;
-                    case '.':
-                        row.add('.');
-                        row.add('.');
-                        break;
-                    case '@':
-                        row.add('@');
-                        row.add('.');
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected in creating wider grid value: " + current);
+                if (grid.get(y).get(x) == '@') {
+                    robot = new Point(x, y);
+                } else if (grid.get(y).get(x) == '#') {
+                    walls.add(new Point(x, y));
+                } else if (grid.get(y).get(x) == 'O') {
+                    boxes.add(new Point(x, y));
+                } else if (grid.get(y).get(x) == '[') {
+                    boxes.add(new Point(x, y));
                 }
             }
-            newGrid.add(row);
         }
-        grid = newGrid;
-        maxX = grid.get(0).size();
-        maxY = grid.size();
-        determineRobot();
     }
 
     public void moveRobot(Character direction) {
-        switch (direction) {
-            case '^' -> tryMoveUp();
-            case '>' -> tryMoveRight();
-            case 'v' -> tryMoveDown();
-            case '<' -> tryMoveLeft();
-            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
-        };
+        var robotCanMove = true;
+        if (isRobotBlockedByWall(direction)) {
+            robotCanMove = false;
+            moveableBoxes.clear();
+        } else {
+            var possibleBox = findBoxPointNextToRobot(direction);
+            if (possibleBox == null) {
+                moveableBoxes.clear();
+            } else {
+                moveableBoxes = findMovableBoxes(possibleBox, direction);
+                robotCanMove = !moveableBoxes.isEmpty();
+            }
+        }
 
+        if (!moveableBoxes.isEmpty()) {
+            var newBoxes = new ArrayList<Point>();
+            newBoxes.addAll(boxes.stream()
+                    .filter(Predicate.not(moveableBoxes::contains))
+                    .toList());
+            newBoxes.addAll(boxes.stream()
+                    .filter(moveableBoxes::contains)
+                    .map(mb -> getNextPoint(mb, direction))
+                    .toList());
+            boxes = newBoxes;
+        }
+
+        if (robotCanMove) {
+            robot = getNextPoint(robot, direction);
+        }
     }
 
-    public void printGrid() {
+    public void printGrid(Character direction) {
         var builder = new StringBuilder();
+        builder.append("Direction: ").append(direction);
+        builder.append("\n");
         for (int y = 0; y < maxY; y++) {
             for (int x = 0; x < maxX; x++) {
                 if (y == robot.y() && x == robot.x()) {
                     builder.append("@");
+                } else if (boxes.contains(new Point(x, y))) {
+                    if (isWide) {
+                        builder.append("[]");
+                        x++;
+                    } else {
+                        builder.append("0");
+                    }
+                } else if (walls.contains(new Point(x, y))) {
+                    builder.append("#");
                 } else {
-                    builder.append(grid.get(y).get(x));
+                    builder.append(".");
                 }
             }
             builder.append("\n");
@@ -88,230 +106,108 @@ public class Warehouse {
         System.out.print(builder);
     }
 
-    public Integer sumGpsCoordinates() {
-        var sum = 0;
-        for (int y = 0; y < maxY; y++) {
-            for (int x = 0; x < maxX; x++) {
-                if (grid.get(y).get(x) == 'O') {
-                    sum += (100 * y) + x;
-                }
-            }
-        }
-        return sum;
+    public Long sumGpsCoordinates() {
+        return boxes.stream()
+                .mapToLong(b -> b.x() + 100L * b.y())
+                .sum();
     }
 
-    private void determineRobot() {
-        for (int y = 0; y < maxY; y++) {
-            for (int x = 0; x < maxX; x++) {
-                if (grid.get(y).get(x) == '@') {
-                    robot = new Point(x, y);
-                    grid.get(y).set(x, '.');
-                }
-            }
-        }
+    private Boolean isRobotBlockedByWall(Character direction) {
+        var next = getNextPoint(robot, direction);
+        return walls.contains(next);
     }
 
-
-    // TODO: Refactor to remove duplicated code
-    private void tryMoveRight() {
-        var targetX = robot.x() + 1;
-        var targetY = robot.y();
-        if (!GridUtility.isPointInBounds(new Point(targetX, targetY), grid))
-            return;
-        if (grid.get(targetY).get(targetX) == '#')
-            return;
-        if (grid.get(targetY).get(targetX) == '.') {
-            robot = new Point(targetX, targetY);
-            return;
+    private Boolean isBoxBlockedByWall(Point box, Character direction) {
+        var next = getNextPoint(box, direction);
+        if (isWide) {
+            var wideNext = getNextPoint(next, '>');
+            return walls.contains(next) || walls.contains(wideNext);
         }
-        // Try to push
-        if (grid.get(targetY).get(targetX) == 'O') {
-            for (var x = targetX; x < maxX; x++) {
-                if (grid.get(targetY).get(x) == '#')
-                    break;
-                if (grid.get(targetY).get(x) == '.') {
-                    for (var backX = x; backX > targetX; backX--) {
-                        grid.get(targetY).set(backX, 'O');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    break;
-                }
-            }
-        } else if (grid.get(targetY).get(targetX) == '[') {
-            for (var x = targetX + 1; x < maxX; x++) {
-                if (grid.get(targetY).get(x) == '#')
-                    break;
-                if (grid.get(targetY).get(x) == '.') {
-                    for (var backX = x; backX > targetX; backX -= 2) {
-                        grid.get(targetY).set(backX, ']');
-                        grid.get(targetY).set(backX - 1, '[');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    grid.get(targetY).set(targetX - 1, '.');
-                    break;
-                }
-            }
-        }
+        return walls.contains(next);
     }
 
-    private void tryMoveDown() {
-        var targetX = robot.x();
-        var targetY = robot.y() + 1;
-        if (!GridUtility.isPointInBounds(new Point(targetX, targetY), grid))
-            return;
-        if (grid.get(targetY).get(targetX) == '#')
-            return;
-        if (grid.get(targetY).get(targetX) == '.') {
-            robot = new Point(targetX, targetY);
-            return;
+    // Returns null if a box is not next to the robot, otherwise returns its position
+    private Point findBoxPointNextToRobot(Character direction) {
+        var next = getNextPoint(robot, direction);
+        if (boxes.contains(next)) {
+            return next;
         }
-        // Try to push
-        if (grid.get(targetY).get(targetX) == 'O') {
-            for (var y = targetY; y < maxY; y++) {
-                if (grid.get(y).get(targetX) == '#')
-                    break;
-                if (grid.get(y).get(targetX) == '.') {
-                    for (var backY = y; backY > targetY; backY--) {
-                        grid.get(backY).set(targetX, 'O');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    break;
-                }
-            }
-        } else if (grid.get(targetY).get(targetX) == '[') {
-            for (var y = targetY; y < maxY; y++) {
-                if (grid.get(y).get(targetX) == '#' || grid.get(y).get(targetX + 1) == '#')
-                    break;
-                if (grid.get(y).get(targetX) == '.' && grid.get(y).get(targetX + 1) == '.') {
-                    for (var backY = y; backY > targetY; backY--) {
-                        grid.get(backY).set(targetX, '[');
-                        grid.get(backY).set(targetX + 1, ']');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    grid.get(targetY).set(targetX + 1, '.');
-                    break;
-                }
-            }
-        } else if (grid.get(targetY).get(targetX) == ']') {
-            for (var y = targetY; y < maxY; y++) {
-                if (grid.get(y).get(targetX) == '#' || grid.get(y).get(targetX - 1) == '#')
-                    break;
-                if (grid.get(y).get(targetX) == '.' && grid.get(y).get(targetX - 1) == '.') {
-                    for (var backY = y; backY > targetY; backY--) {
-                        grid.get(backY).set(targetX, ']');
-                        grid.get(backY).set(targetX - 1, '[');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    grid.get(targetY).set(targetX - 1, '.');
-                    break;
-                }
+        if (isWide) {
+            var wideNext = getNextPoint(next, '<');
+            if (boxes.contains(wideNext)) {
+                return wideNext;
             }
         }
+        return null;
     }
 
-    private void tryMoveLeft() {
-        var targetX = robot.x() - 1;
-        var targetY = robot.y();
-        if (!GridUtility.isPointInBounds(new Point(targetX, targetY), grid))
-            return;
-        if (grid.get(targetY).get(targetX) == '#')
-            return;
-        if (grid.get(targetY).get(targetX) == '.') {
-            robot = new Point(targetX, targetY);
-            return;
-        }
-        // Try to push
-        if (grid.get(targetY).get(targetX) == 'O') {
-            for (var x = targetX; x >= 0; x--) {
-                if (grid.get(targetY).get(x) == '#')
-                    break;
-                if (grid.get(targetY).get(x) == '.') {
-                    for (var backX = x; backX < targetX; backX++) {
-                        grid.get(targetY).set(backX, 'O');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    break;
-                }
+    private List<Point> findMovableBoxes(Point initialPosition, Character direction) {
+        var visited = new ArrayList<Point>();
+        var queue = new ArrayDeque<Point>();
+        queue.add(initialPosition);
+        while (!queue.isEmpty()) {
+            var current = queue.poll();
+            if (visited.contains(current)) {
+                continue;
             }
-        } else if (grid.get(targetY).get(targetX) == ']') {
-            for (var x = targetX - 1; x >= 0; x--) {
-                if (grid.get(targetY).get(x) == '#')
-                    break;
-                if (grid.get(targetY).get(x) == '.') {
-                    for (var backX = x; backX < targetX; backX += 2) {
-                        grid.get(targetY).set(backX, '[');
-                        grid.get(targetY).set(backX + 1, ']');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    grid.get(targetY).set(targetX + 1, '.');
-                    break;
+            visited.add(current);
+            var next = getNextPoint(current, direction);
+            if (boxes.contains(next)) {
+                queue.addLast(next);
+            }
+            if (isWide) {
+                var wideNext = getNextPoint(next, '>');
+                if (boxes.contains(wideNext)) {
+                    queue.addLast(wideNext);
+                }
+                var wideEast = getNextPoint(next, '<');
+                if (boxes.contains(wideEast)) {
+                    queue.addLast(wideEast);
                 }
             }
         }
+        return visited.stream()
+                .noneMatch(p -> isBoxBlockedByWall(p, direction))
+                ? visited
+                : new ArrayList<>();
     }
 
-    private void tryMoveUp() {
-        var targetX = robot.x();
-        var targetY = robot.y() - 1;
-        if (!GridUtility.isPointInBounds(new Point(targetX, targetY), grid))
-            return;
-        if (grid.get(targetY).get(targetX) == '#')
-            return;
-        if (grid.get(targetY).get(targetX) == '.') {
-            robot = new Point(targetX, targetY);
+    private Point getNextPoint(Point current, Character direction) {
+        return switch (direction) {
+            case '^' -> new Point(current.x(), current.y() - 1);
+            case '>' -> new Point(current.x() + 1, current.y());
+            case 'v' -> new Point(current.x(), current.y() + 1);
+            case '<' -> new Point(current.x() - 1, current.y());
+            default -> throw new IllegalArgumentException("Invalid direction: " + direction);
+        };
+    }
+
+    private void checkAndWidenGrid() {
+        if (!isWide) {
             return;
         }
-        // Try to push
-        if (grid.get(targetY).get(targetX) == 'O') {
-            for (var y = targetY; y >= 0; y--) {
-                if (grid.get(y).get(targetX) == '#')
-                    break;
-                if (grid.get(y).get(targetX) == '.') {
-                    for (var backY = y; backY < targetY; backY++) {
-                        grid.get(backY).set(targetX, 'O');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    break;
+
+        var newGrid = new ArrayList<List<Character>>();
+        for (List<Character> characters : grid) {
+            var row = new ArrayList<Character>();
+            for (var x = 0; x < grid.get(0).size(); x++) {
+                var current = characters.get(x);
+                if (current.equals('#')) {
+                    row.add('#');
+                    row.add('#');
+                } else if (current.equals('.')) {
+                    row.add('.');
+                    row.add('.');
+                } else if (current.equals('O')) {
+                    row.add('[');
+                    row.add(']');
+                } else if (current.equals('@')) {
+                    row.add('@');
+                    row.add('.');
                 }
             }
-        } else if (grid.get(targetY).get(targetX) == '[') {
-            for (var y = targetY; y >= 0; y--) {
-                if (grid.get(y).get(targetX) == '#' || grid.get(y).get(targetX + 1) == '#')
-                    break;
-                if (grid.get(y).get(targetX) == '.' && grid.get(y).get(targetX + 1) == '.') {
-                    for (var backY = y; backY < targetY; backY++) {
-                        grid.get(backY).set(targetX, '[');
-                        grid.get(backY).set(targetX + 1, ']');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    grid.get(targetY).set(targetX + 1, '.');
-                    break;
-                }
-            }
-        } else if (grid.get(targetY).get(targetX) == ']') {
-            for (var y = targetY; y >= 0; y--) {
-                if (grid.get(y).get(targetX) == '#' || grid.get(y).get(targetX - 1) == '#')
-                    break;
-                if (grid.get(y).get(targetX) == '.' && grid.get(y).get(targetX - 1) == '.') {
-                    for (var backY = y; backY < targetY; backY++) {
-                        grid.get(backY).set(targetX, ']');
-                        grid.get(backY).set(targetX - 1, '[');
-                    }
-                    robot = new Point(targetX, targetY);
-                    grid.get(targetY).set(targetX, '.');
-                    grid.get(targetY).set(targetX - 1, '.');
-                    break;
-                }
-            }
+            newGrid.add(row);
         }
+        grid = newGrid;
     }
 }

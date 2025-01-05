@@ -33,9 +33,9 @@ public class Day15 implements IAdventProblemSet {
      * {@inheritDoc}
      */
     public String partB() {
-        var filePath = FileUtility.dataPath + "Day14Input.txt";
-        // var total = moveRobotsUntilChristmasTree(filePath, 100, 102, Integer.MAX_VALUE);
-        return "-1";
+        var filePath = FileUtility.dataPath + "Day15Input.txt";
+        var total = sumGpsCoordinates(filePath, true);
+        return total.toString();
     }
 
     /***
@@ -52,7 +52,7 @@ public class Day15 implements IAdventProblemSet {
         return true;
     }
 
-    protected Integer sumGpsCoordinates(String filePath, Boolean isWide) {
+    protected Long sumGpsCoordinates(String filePath, Boolean isWide) {
         var lines = FileUtility.parseFileToList(filePath, line -> line);
         var warehouseLines = new ArrayList<String>();
         var builder = new StringBuilder();
@@ -68,20 +68,14 @@ public class Day15 implements IAdventProblemSet {
                 builder.append(line.replace("\n", ""));
             }
         }
-        var warehouse = new Warehouse(warehouseLines);
-        if (isWide) {
-            warehouse.widen();
-            warehouse.printGrid();
-        }
+        var warehouse = new Warehouse(warehouseLines, isWide);
         for (Character inst : builder.toString().toCharArray()) {
             warehouse.moveRobot(inst);
-            warehouse.printGrid();
+            // warehouse.printGrid(inst);
         }
-        warehouse.printGrid();
+        warehouse.printGrid('%');
         return warehouse.sumGpsCoordinates();
     }
-
-    // TODO: TW - Still have to implement Part B
 }
 
 
